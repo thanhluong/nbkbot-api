@@ -86,7 +86,7 @@ class ChatAnswerView(CsrfExemptMixin, APIView):
         query: str,
         df: pd.DataFrame,
         model: str,
-        token_budget: int = 2048,
+        token_budget: int = 1664,
         print_message: bool = False,
     ) -> str:
         """Answers a query using GPT and a dataframe of relevant texts and embeddings."""
