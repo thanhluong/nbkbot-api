@@ -14,7 +14,7 @@ from scipy import spatial
 
 
 ERR_MESSAGE_NO_QUESTION_PROVIDED = "Bạn chưa cung cấp câu hỏi!"
-ERR_UNKNOWN = "Đã xảy ra lỗi!" 
+ERR_UNKNOWN = "Đã xảy ra lỗi! (mình cũng không biết lỗi chỗ nào hehe)" 
 
 
 class ChatAnswerView(CsrfExemptMixin, APIView):
