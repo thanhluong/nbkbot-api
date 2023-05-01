@@ -9,6 +9,7 @@ from .utils import *
 
 import openai
 import pandas as pd
+import ast
 from scipy import spatial
 
 
@@ -27,6 +28,7 @@ class ChatAnswerView(CsrfExemptMixin, APIView):
         self.embedding_model = settings.EMBEDDING_MODEL
         self.gpt_model = settings.GPT_MODEL
         self.df = pd.read_csv(settings.EMBEDDING_PATHS)
+        self.df['embedding'] = self.df['embedding'].apply(ast.literal_eval)
         self.prompt_introduction = settings.PROMPT_INTRODUCTION
 
 
@@ -88,7 +90,9 @@ class ChatAnswerView(CsrfExemptMixin, APIView):
         print_message: bool = False,
     ) -> str:
         """Answers a query using GPT and a dataframe of relevant texts and embeddings."""
+        print("before generating message...")
         message = self.query_message(query, df, model=model, token_budget=token_budget)
+        print("after generating message...")
         if print_message:
             print(message)
         messages = [
