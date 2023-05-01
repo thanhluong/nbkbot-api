@@ -83,7 +83,7 @@ class ChatAnswerView(CsrfExemptMixin, APIView):
         self,
         query: str,
         df: pd.DataFrame,
-        model: str = GPT_MODEL,
+        model: str,
         token_budget: int = 2048,
         print_message: bool = False,
     ) -> str:
@@ -112,7 +112,11 @@ class ChatAnswerView(CsrfExemptMixin, APIView):
             return error_response(1, ERR_MESSAGE_NO_QUESTION_PROVIDED)
         
         try:
-            answer = self.ask(question, self.df)
+            answer = self.ask(
+                query=question, 
+                df=self.df,
+                model=self.gpt_model
+            )
         except Exception as e:
             return error_response(2, ERR_UNKNOWN)
         
