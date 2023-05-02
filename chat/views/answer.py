@@ -4,7 +4,9 @@ from rest_framework.parsers import JSONParser
 from braces.views import CsrfExemptMixin
 
 from django.conf import settings
+from django.utils import timezone
 
+from chat.models import ChatMessage
 from .utils import *
 
 import openai
@@ -90,9 +92,7 @@ class ChatAnswerView(CsrfExemptMixin, APIView):
         print_message: bool = False,
     ) -> str:
         """Answers a query using GPT and a dataframe of relevant texts and embeddings."""
-        print("before generating message...")
         message = self.query_message(query, df, model=model, token_budget=token_budget)
-        print("after generating message...")
         if print_message:
             print(message)
         messages = [
@@ -106,6 +106,14 @@ class ChatAnswerView(CsrfExemptMixin, APIView):
         )
         response_message = response["choices"][0]["message"]["content"]
         return response_message
+
+
+    def write_to_db(self, question, answer):
+        ChatMessage.objects.create(
+            message=question,
+            response=answer,
+            created_at=timezone.now()
+        )
 
 
     # API
@@ -122,6 +130,8 @@ class ChatAnswerView(CsrfExemptMixin, APIView):
                 model=self.gpt_model
             )
         except Exception as e:
+            self.write_to_db(question, "no answer")
             return error_response(2, ERR_UNKNOWN)
         
+        self.write_to_db(question, answer)
         return ai_response(answer)
