@@ -32,6 +32,7 @@ class ChatAnswerView(CsrfExemptMixin, APIView):
         self.df = pd.read_csv(settings.EMBEDDING_PATHS)
         self.df['embedding'] = self.df['embedding'].apply(ast.literal_eval)
         self.prompt_introduction = settings.PROMPT_INTRODUCTION
+        self.token_budget = settings.TOKEN_BUDGET
 
 
     # search function
@@ -68,10 +69,10 @@ class ChatAnswerView(CsrfExemptMixin, APIView):
         """Return a message for GPT, with relevant source texts pulled from a dataframe."""
         strings, relatednesses = self.strings_ranked_by_relatedness(query, df)
         introduction = self.prompt_introduction
-        question = f"\n\Câu hỏi cần trả lời: {query}"
-        message = introduction
+        question = f"\n<Câu hỏi cần trả lời> {query} </Câu hỏi cần trả lời>"
+        message = introduction + question
         for string in strings:
-            next_article = f'\n\Thông tin:\n"""\n{string}\n"""'
+            next_article = f'\n<Thông tin>\n"""\n{string}\n"""\n</Thông tin>'
             if (
                 num_tokens(message + next_article + question, model=model)
                 > token_budget
@@ -79,7 +80,7 @@ class ChatAnswerView(CsrfExemptMixin, APIView):
                 break
             else:
                 message += next_article
-        return message + question
+        return message
 
 
     # answer function
@@ -88,11 +89,10 @@ class ChatAnswerView(CsrfExemptMixin, APIView):
         query: str,
         df: pd.DataFrame,
         model: str,
-        token_budget: int = 1664,
         print_message: bool = False,
     ) -> str:
         """Answers a query using GPT and a dataframe of relevant texts and embeddings."""
-        message = self.query_message(query, df, model=model, token_budget=token_budget)
+        message = self.query_message(query, df, model=model, token_budget=self.token_budget)
         if print_message:
             print(message)
         messages = [
