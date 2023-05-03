@@ -69,7 +69,7 @@ class ChatAnswerView(CsrfExemptMixin, APIView):
         """Return a message for GPT, with relevant source texts pulled from a dataframe."""
         strings, relatednesses = self.strings_ranked_by_relatedness(query, df)
         introduction = self.prompt_introduction
-        question = f"\n<Câu hỏi cần trả lời> {query} </Câu hỏi cần trả lời>"
+        question = f"\n<Câu hỏi cần trả lời> '{query}' </Câu hỏi cần trả lời>"
         message = introduction + question
         for string in strings:
             next_article = f'\n<Thông tin>\n"""\n{string}\n"""\n</Thông tin>'
