@@ -12,7 +12,7 @@ def get_embedding(text, model="text-embedding-ada-002"):
    return openai.Embedding.create(input = [text], model=model)['data'][0]['embedding']
 
 
-def num_tokens(text: str, model: str = settings.GPT_MODEL) -> int:
+def num_tokens(text: str, model: str = settings.EMBEDDING_MODEL) -> int:
     """Return the number of tokens in a string."""
     encoding = tiktoken.encoding_for_model(model)
     return len(encoding.encode(text))
